@@ -65,6 +65,8 @@
     return _MAX(
       #if IS_KINEMATIC
         PROBE_X_MIN, MESH_MIN_X
+      #elif ENABLED(NOZZLE_AS_PROBE)
+        MIN_PROBE_EDGE_LEFT, X_MIN_POS
       #else
         (X_MIN_BED) + (MIN_PROBE_EDGE_LEFT), (X_MIN_POS) + probe_offset.x
       #endif
@@ -74,6 +76,8 @@
     return _MIN(
       #if IS_KINEMATIC
         PROBE_X_MAX, MESH_MAX_X
+      #elif ENABLED(NOZZLE_AS_PROBE)
+        MIN_PROBE_EDGE_RIGHT, X_MAX_POS
       #else
         (X_MAX_BED) - (MIN_PROBE_EDGE_RIGHT), (X_MAX_POS) + probe_offset.x
       #endif
@@ -83,6 +87,8 @@
     return _MAX(
       #if IS_KINEMATIC
         PROBE_Y_MIN, MESH_MIN_Y
+      #elif ENABLED(NOZZLE_AS_PROBE)
+        MIN_PROBE_EDGE_FRONT, Y_MIN_POS
       #else
         (Y_MIN_BED) + (MIN_PROBE_EDGE_FRONT), (Y_MIN_POS) + probe_offset.y
       #endif
@@ -92,6 +98,8 @@
     return _MIN(
       #if IS_KINEMATIC
         PROBE_Y_MAX, MESH_MAX_Y
+      #elif ENABLED(NOZZLE_AS_PROBE)
+        MIN_PROBE_EDGE_BACK, Y_MAX_POS
       #else
         (Y_MAX_BED) - (MIN_PROBE_EDGE_BACK), (Y_MAX_POS) + probe_offset.y
       #endif
