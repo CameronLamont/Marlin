@@ -16,7 +16,7 @@
 //#define MachineCR10
 //#define MachineCR10S
 //#define MachineCR10SV2
-#define MachineCR10SPro // Graphics LCD Requires soldering R64 and R66
+//#define MachineCR10SPro // Graphics LCD Requires soldering R64 and R66
 //#define MachineCR10SProV2 // Second Gen 10S Pro with BLTouch wired to Z Max
 //#define MachineCRX
 //#define MachineCR10Max
@@ -24,6 +24,7 @@
 //#define MachineS5
 //#define MachineCR2020 // Industrial Series 2020
 
+#define MachineWanhaoD9Mk2
 
 /*
    Enabled this for linear advance instead of mesh leveling on a melzi board
@@ -73,7 +74,7 @@
  */
 
  //#define EZRstruder
- //#define Bondtech
+ #define Bondtech
  //#define E3DTitan
 
  //#define DirectDrive // Any direct drive extruder, reduces filament change lengths
@@ -330,9 +331,17 @@
   #define SolidBedMounts
 #endif
 
+#if(ENABLED(MachineWanhaoD9Mk2))
+
+#define ABL_BLTOUCH
+#define ABL_BI
+//  #define POWER_LOSS_RECOVERY
+
+#endif
+
 //Show the Marlin bootscreen on startup. ** ENABLE FOR PRODUCTION **
 
-#if NONE(MachineCR10Orig, MachineEnder4, MachineCR10SPro, MachineCRX, MachineCR10Max, MachineEnder5Plus) || ENABLED(GraphicLCD)
+#if NONE(MachineCR10Orig, MachineEnder4, MachineCR10SPro, MachineWanhaoD9Mk2, MachineCRX, MachineCR10Max, MachineEnder5Plus) || ENABLED(GraphicLCD)
   #define SHOW_BOOTSCREEN
 
 // Show the bitmap in Marlin/_Bootscreen.h on startup.
@@ -373,6 +382,8 @@
 #define CUSTOM_MACHINE_NAME "500 SuPeR"
 #elif ENABLED(MachineCR2020)
   #define CUSTOM_MACHINE_NAME "TM3D 2020"
+#elif ENABLED(MachineWanhaoD9Mk2)
+  #define CUSTOM_MACHINE_NAME "Wanhao D9 Mk2"
 #endif
 
 #if(ENABLED(MachineMini))
@@ -401,6 +412,8 @@
 #define VerChar1 "5"
 #elif ENABLED(MachineCR2020)
   #define VerChar1 "20"
+#elif ENABLED(MachineWanhaoD9Mk2)
+  #define VerChar1 "D9"
 #endif
 
 #if(ENABLED(HotendStock))
@@ -481,6 +494,8 @@
 #ifndef MOTHERBOARD
   #if ENABLED(SKR13)
     #define MOTHERBOARD BOARD_BIGTREE_SKR_V1_3
+  #elif ENABLED(MachineWanhaoD9Mk2)
+    #define MOTHERBOARD BOARD_WANHAO_D9
   #elif (ENABLED(MachineCR10Orig) && DISABLED(Melzi_To_SBoardUpgrade))
     #define MOTHERBOARD BOARD_MELZI_CREALITY
   #else
@@ -792,7 +807,11 @@
 #define TEMP_SENSOR_4 0
 #define TEMP_SENSOR_5 0
 #if ENABLED(BedDC)
-	#define TEMP_SENSOR_BED 5
+  #if(ENABLED(MachineWanhaoD9Mk2))
+    #define TEMP_SENSOR_BED 1
+  #else
+	  #define TEMP_SENSOR_BED 5
+  #endif
 #elif ENABLED(BedAC)
 	#define TEMP_SENSOR_BED 11
 #else
@@ -878,6 +897,10 @@
     #define DEFAULT_Kp 25.25
     #define DEFAULT_Ki 2.17
     #define DEFAULT_Kd 73.44
+  #elif ENABLED(MachineWanhaoD9Mk2)
+     #define  DEFAULT_Kp 33.41
+    #define  DEFAULT_Ki 1.47
+    #define  DEFAULT_Kd 189.27
   #elif ENABLED(MachineEnder5Plus)
     #define  DEFAULT_Kp 14.72
     #define  DEFAULT_Ki 0.89
@@ -965,6 +988,10 @@
     #define  DEFAULT_bedKp 690.34
     #define  DEFAULT_bedKi 111.47
     #define  DEFAULT_bedKd 1068.83
+  #elif ENABLED(MachineWanhaoD9Mk2)
+    #define  DEFAULT_bedKp 354.39
+    #define  DEFAULT_bedKi 17.24
+    #define  DEFAULT_bedKd 1821.73
   #else
     #define  DEFAULT_bedKp 690.34
     #define  DEFAULT_bedKi 111.47
@@ -1086,20 +1113,27 @@
 #endif
 
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
-#if ANY(MachineEnder4, MachineCR2020)
+#if ANY(MachineWanhaoD9Mk2, MachineEnder4, MachineCR2020)
   #define X_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 #else
   #define X_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #endif
-#if ENABLED(MachineCR2020)
+#if ANY(MachineWanhaoD9Mk2,MachineCR2020)
   #define Y_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 #else
   #define Y_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #endif
-#define X_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Y_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-#define Z_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
 
+#if ANY(MachineWanhaoD9Mk2)
+  // possibly unecessary but was in the Wanhao firmware
+  #define X_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+  #define Y_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+  #define Z_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#else
+  #define X_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
+  #define Y_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
+  #define Z_MAX_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#endif
 #if NONE(ABL_EZABL, ABL_BLTOUCH, MachineCR2020)
   #define Z_MIN_ENDSTOP_INVERTING false  // set to true to invert the logic of the endstop.
   #define Z_MIN_PROBE_ENDSTOP_INVERTING false // set to true to invert the logic of the probe.
@@ -1245,6 +1279,12 @@
   #define DEFAULT_ACCELERATION          750    // X, Y, Z and E acceleration for printing moves
   #define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
   #define DEFAULT_TRAVEL_ACCELERATION   300    // X, Y, Z acceleration for travel (non printing) moves
+#elif ENABLED(MachineWanhaoD9Mk2)
+  #define DEFAULT_MAX_FEEDRATE          { 300, 300, 5, 25 } //{ 300, 300, 5, 25 }
+  #define DEFAULT_MAX_ACCELERATION      {3000,3000,100,3000}
+  #define DEFAULT_ACCELERATION          800    // X, Y, Z and E acceleration for printing moves
+  #define DEFAULT_RETRACT_ACCELERATION  800    // E acceleration for retracts
+  #define DEFAULT_TRAVEL_ACCELERATION   1000  // X, Y, Z acceleration for travel (non printing) moves
 #elif (ANY(MachineMini, MachineCR20, MachineEnder2, MachineEnder3, MachineEnder4, MachineEnder5, MachineEnder5Plus))
   #define DEFAULT_MAX_FEEDRATE          { 750, 750, 10, 75 }
   #define DEFAULT_MAX_ACCELERATION      { 2000, 2000, 100, 75 }
@@ -1497,6 +1537,8 @@
    #elif ANY(ABL_EZABL, ABL_NCSW)
      #define NOZZLE_TO_PROBE_OFFSET { -44, -10, 0 }
    #endif
+#elif ENABLED(MachineWanhaoD9Mk2)
+  #define NOZZLE_TO_PROBE_OFFSET { 50, 0, -3.07 }
 #elif ANY(MachineCR10SPro, MachineCR10Max) && ENABLED(HotendStock)
   #define NOZZLE_TO_PROBE_OFFSET { -27, 0, 0 }
 #elif ENABLED(MachineCR10SV2)
@@ -1535,6 +1577,8 @@
 // Certain types of probes need to stay away from edges
 #if ENABLED(MachineCR10Max, MachineCR10SV2)
   #define MIN_PROBE_EDGE 15
+#elif ENABLED(MachineWanhaoD9Mk2)
+  #define MIN_PROBE_EDGE 50
 #elif ENABLED(ABL_BLTOUCH)
   #define MIN_PROBE_EDGE 3
 #else
@@ -1542,7 +1586,7 @@
 #endif
 
 // X and Y axis travel speed (mm/m) between probes
-#define XY_PROBE_SPEED 6000
+#define XY_PROBE_SPEED 10000
 
 // Feedrate (mm/m) for the first approach when double-probing (MULTIPLE_PROBING == 2)
 #define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z
@@ -1658,6 +1702,11 @@
     #define INVERT_E0_DIR true
     #define INVERT_E1_DIR false
   #endif
+#elif ENABLED(MachineWanhaoD9Mk2)
+  #define INVERT_X_DIR true
+  #define INVERT_Y_DIR false
+  #define INVERT_Z_DIR false
+  #define INVERT_E0_DIR true
 #elif ANY(MachineCR10Orig, SKR13_ReverseSteppers)
   #define INVERT_X_DIR true
   #define INVERT_Y_DIR true
@@ -1732,6 +1781,10 @@
     #define X_BED_SIZE 300
     #define Y_BED_SIZE 220
     #define Z_MAX_POS 300
+  #elif ENABLED(MachineWanhaoD9Mk2)
+    #define X_BED_SIZE 300
+    #define Y_BED_SIZE 300
+    #define Z_MAX_POS 400
   #elif ENABLED(MachineEnder2)
     #define X_BED_SIZE 150
     #define Y_BED_SIZE 150
@@ -1781,6 +1834,11 @@
     #define X_BED_SIZE 300
     #define Y_BED_SIZE 220
     #define Z_MAX_POS 300
+    #define ClipClearance 15
+  #elif ENABLED(MachineWanhaoD9Mk2)
+    #define X_BED_SIZE 300
+    #define Y_BED_SIZE 300
+    #define Z_MAX_POS 400
     #define ClipClearance 15
   #elif(ENABLED(MachineEnder2))
     #define X_BED_SIZE 150
@@ -1885,7 +1943,7 @@
  * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
  * By default the firmware assumes HIGH=FILAMENT PRESENT.
  */
-#if (NONE(MachineCR10Orig, MachineCR20, MachineEnder4, MachineEnder5, MachineCRX) || ANY(AddonFilSensor, lerdgeFilSensor, DualFilSensors  ))
+#if (NONE(MachineWanhaoD9Mk2, MachineCR10Orig, MachineCR20, MachineEnder4, MachineEnder5, MachineCRX) || ANY(AddonFilSensor, lerdgeFilSensor, DualFilSensors  ))
   #define FILAMENT_RUNOUT_SENSOR
 #endif
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
@@ -2657,7 +2715,7 @@
   #define MINIPANEL
 #elif ANY(MachineCR20, MachineCR2020)
   #define MKS_MINI_12864
-#elif NONE(MachineCR10SPro, MachineCRX, MachineEnder5Plus, MachineCR10Max, OrigLCD) || ENABLED(GraphicLCD)
+#elif NONE(MachineCR10SPro, MachineWanhaoD9Mk2, MachineCRX, MachineEnder5Plus, MachineCR10Max, OrigLCD) || ENABLED(GraphicLCD)
   #define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
 #elif ENABLED(OrigLCD)
   #define CR10_STOCKDISPLAY
@@ -2908,7 +2966,7 @@
 // Third-party or vendor-customized controller interfaces.
 // Sources should be installed in 'src/lcd/extensible_ui'.
 //
-#if ANY(MachineCR10SPro, MachineCRX, MachineEnder5Plus, MachineCR10Max) && DISABLED(GraphicLCD)
+#if ANY(MachineWanhaoD9Mk2, MachineCR10SPro, MachineCRX, MachineEnder5Plus, MachineCR10Max) && DISABLED(GraphicLCD)
   #define EXTENSIBLE_UI
 #endif
 
@@ -3070,7 +3128,9 @@
  * Set this manually if there are extra servos needing manual control.
  * Leave undefined or set to 0 to entirely disable the servo subsystem.
  */
-//#define NUM_SERVOS 3 // Servo index starts with 0 for M280 command
+#if ENABLED(MachineWanhaoD9Mk2)
+  #define NUM_SERVOS 1 // Servo index starts with 0 for M280 command
+#endif
 
 // (ms) Delay  before the next move will start, to give the servo time to reach its target angle.
 // 300ms is a good value but you can try less delay.

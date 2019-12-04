@@ -168,7 +168,7 @@
  */
 #if ENABLED(THERMAL_PROTECTION_BED)
 #if(ENABLED(BedDC))
-  #if EITHER(MachineS5, MachineCR10Max)
+  #if ANY(MachineWanhaoD9Mk2, MachineS5, MachineCR10Max)
     #define THERMAL_PROTECTION_BED_PERIOD 240    // Seconds
     #define THERMAL_PROTECTION_BED_HYSTERESIS 4 // Degrees Celsius
 
@@ -942,7 +942,7 @@
   // as SD_DETECT_PIN in your board's pins definitions.
   // This setting should be disabled unless you are using a push button, pulling the pin to ground.
   // Note: This is always disabled for ULTIPANEL (except ELB_FULL_GRAPHIC_CONTROLLER).
-  #if NONE(MachineCR10SPro, MachineCRX, MachineEnder5Plus, MachineCR10Max)
+  #if NONE(MachineWanhaoD9Mk2, MachineCR10SPro, MachineCRX, MachineEnder5Plus, MachineCR10Max)
     #define SD_DETECT_INVERTED
   #endif
   #define SD_FINISHED_STEPPERRELEASE true          // Disable steppers when SD Print is finished
