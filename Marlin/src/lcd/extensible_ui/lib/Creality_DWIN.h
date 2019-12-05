@@ -59,9 +59,9 @@ namespace ExtUI {
 #define	DisplayYaxis			0x104A
 #define	DisplayZaxis			0x104C
 
-#define	FilementUnit1		0x1054
-#define	Exchfilement			0x1056
-#define	FilementUnit2		0x1058
+#define	FilamentUnit1		0x1054
+#define	ExchFilament			0x1056
+#define	FilamentUnit2		0x1058
 
 #define	MacVersion			0x1060
 #define	SoftVersion			0x106A
@@ -110,7 +110,7 @@ class RTSSHOW {
     int RTS_RecData();
     void RTS_SDCardInit(void);
     void RTS_SDCardUpate(bool, bool);
-    int RTS_CheckFilement(int);
+    int RTS_CheckFilament(int);
     void RTS_SndData(void);
     void RTS_SndData(const String &, unsigned long, unsigned char = VarAddr_W);
     void RTS_SndData(const char[], unsigned long, unsigned char = VarAddr_W);
@@ -137,12 +137,12 @@ static RTSSHOW rtscheck;
   #define	Zoffset_Value		(3+Addvalue)
   #define	Setting_Value		(8+Addvalue)
   #define	XYZEaxis_Value		(12+Addvalue)
-  #define	Filement_Value		(15+Addvalue)
+  #define	Filament_Value		(15+Addvalue)
   #define	Language_Value		(18+Addvalue)
   #define	Filename_Value		(22+Addvalue)
 
-  enum PROC_COM {Printfile=0,Ajust,Feedrate,PrintChoice=PrintChoice_Value,Zoffset=Zoffset_Value,TempControl,ManualSetTemp,Setting=Setting_Value,
-  ReturnBack,Bedlevel,Autohome,XYZEaxis=XYZEaxis_Value,Filement=Filement_Value,LanguageChoice=Language_Value,No_Filement,PwrOffNoF,Volume,Filename=Filename_Value};
+  enum PROC_COM {Printfile=0,Adjust,Feedrate,PrintChoice=PrintChoice_Value,Zoffset=Zoffset_Value,TempControl,ManualSetTemp,Setting=Setting_Value,
+  ReturnBack,Bedlevel,Autohome,XYZEaxis=XYZEaxis_Value,Filament=Filament_Value,LanguageChoice=Language_Value,No_Filament,PwrOffNoF,Volume,Filename=Filename_Value};
 
   const unsigned long Addrbuf[] = {0x1002, 0x1004, 0x1006, 0x1008, 0x100A, 0x100C,  0x1026, 0x1030, 0x1032, 0x1034, 0x103A,
                 0x103E, 0x1040, 0x1044, 0x1046, 0x1048, 0x104A, 0x104C, 0x1054, 0x1056, 0x1058,
@@ -159,7 +159,7 @@ extern bool AutohomeKey;
 extern bool TPShowStatus;
 extern int Update_Time_Value;
 extern bool PoweroffContinue;
-extern char FilementStatus[2];
+extern char FilamentStatus[2];
 extern char commandbuf[30];
 
 extern int temphot;

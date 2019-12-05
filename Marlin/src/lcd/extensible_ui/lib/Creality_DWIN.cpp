@@ -28,8 +28,8 @@ namespace ExtUI
   char PrintStatue[2] = {0};		//PrintStatue[0], 0 represent  to 43 page, 1 represent to 44 page
 
   char PrinterStatusKey[2] = {0}; // PrinterStatusKey[1] value: 0 represents to keep temperature, 1 represents  to heating , 2 stands for cooling , 3 stands for printing
-                  // PrinterStatusKey[0] value: 0 reprensents 3D printer ready
-  char FilementStatus[2] = {0};
+                  
+  char FilamentStatus[2] = {0}; // FilamentStatus[0] value: 0 represents 3D printer ready, 1 represents ?, 2 represents ?, 3 represents change filament?
 
   unsigned char AxisPagenum = 0; //0 for 10mm, 1 for 1mm, 2 for 0.1mm
   bool InforShowStatus = true;
@@ -314,7 +314,7 @@ void onIdle()
       rtscheck.RTS_SndData(getTargetTemp_celsius(H0), NozzlePreheat);
 			rtscheck.RTS_SndData(getTargetTemp_celsius(BED), BedPreheat);
 
-			if (NozzleTempStatus[0] || NozzleTempStatus[2]) //statuse of loadfilement and unloadfinement when temperature is less than
+			if (NozzleTempStatus[0] || NozzleTempStatus[2]) //statuse of loadFilament and unloadfinement when temperature is less than
 			{
 				unsigned int IconTemp;
 
@@ -325,8 +325,8 @@ void onIdle()
 				if (getActualTemp_celsius(H0) > EXTRUDE_MINTEMP && NozzleTempStatus[0]!=0)
 				{
 					NozzleTempStatus[0] = 0;
-					rtscheck.RTS_SndData(10 * ChangeMaterialbuf[0], FilementUnit1);
-					rtscheck.RTS_SndData(10 * ChangeMaterialbuf[1], FilementUnit2);
+					rtscheck.RTS_SndData(10 * ChangeMaterialbuf[0], FilamentUnit1);
+					rtscheck.RTS_SndData(10 * ChangeMaterialbuf[1], FilamentUnit2);
           SERIAL_ECHOLN("==Heating Done Change Filament==");
 					rtscheck.RTS_SndData(ExchangePageBase + 65, ExchangepageAddr);
 				}
@@ -694,8 +694,8 @@ void RTSSHOW::RTS_HandleData()
 				Checkkey = ManualSetTemp;
 			else if (Addrbuf[i] >= AutoZero && Addrbuf[i] <= DisplayZaxis)
 				Checkkey = XYZEaxis;
-			else if (Addrbuf[i] >= FilementUnit1 && Addrbuf[i] <= FilementUnit2)
-				Checkkey = Filement;
+			else if (Addrbuf[i] >= FilamentUnit1 && Addrbuf[i] <= FilamentUnit2)
+				Checkkey = Filament;
 			else
 				Checkkey = i;
 			break;
@@ -785,7 +785,7 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
         InforShowStatus = false;
       break;
 
-    case Ajust:
+    case Adjust:
       if (recdat.data[0] == 1)
       {
         InforShowStatus = false;
@@ -1030,14 +1030,14 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
 
         RTS_SndData(ExchangePageBase + 64, ExchangepageAddr);
       }
-      else if (recdat.data[0] == 2) // Exchange filement
+      else if (recdat.data[0] == 2) // Exchange Filament
       {
         InforShowStatus = true;
         TPShowStatus = false;
         memset(ChangeMaterialbuf, 0, sizeof(ChangeMaterialbuf));
         ChangeMaterialbuf[1] = ChangeMaterialbuf[0] = 10;
-        RTS_SndData(10 * ChangeMaterialbuf[0], FilementUnit1); //It's ChangeMaterialbuf for show,instead of current_position[E_AXIS] in them.
-        RTS_SndData(10 * ChangeMaterialbuf[1], FilementUnit2);
+        RTS_SndData(10 * ChangeMaterialbuf[0], FilamentUnit1); //It's ChangeMaterialbuf for show,instead of current_position[E_AXIS] in them.
+        RTS_SndData(10 * ChangeMaterialbuf[1], FilamentUnit2);
         RTS_SndData(getActualTemp_celsius(H0), NozzleTemp);
         RTS_SndData(getTargetTemp_celsius(H0), NozzlePreheat);
         delay_ms(2);
@@ -1135,7 +1135,7 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
         }
         case autoMeasure: // AutoLevel "Measuring" Button
         {
-          waitway = 3; //only for prohibiting to receive massage
+          waitway = 3; //only for prohibiting to receive message
           RTS_SndData(3, AutolevelIcon);
           bool zig = true;
           for (uint8_t yCount = 0, showcount = 0; yCount < GRID_MAX_POINTS_Y; yCount++)
@@ -1178,7 +1178,7 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
           break;
         }
 
-        case centerData: // Assitant Level ,  Centre 1
+        case centerData: // Assistant Level ,  Centre 1
         {
           setAxisPosition_mm(LEVEL_CORNERS_Z_HOP, (axis_t)Z);
           setAxisPosition_mm(X_CENTER, (axis_t)X);
@@ -1186,7 +1186,7 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
           waitway = 6;
           break;
         }
-        case topLeftData: // Assitant Level , Front Left 2
+        case topLeftData: // Assistant Level , Front Left 2
         {
           setAxisPosition_mm(LEVEL_CORNERS_Z_HOP, (axis_t)Z);
           setAxisPosition_mm((X_MIN_BED + LEVEL_CORNERS_INSET), (axis_t)X);
@@ -1194,7 +1194,7 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
           waitway = 6;
           break;
         }
-        case topRightData: // Assitant Level , Front Right 3
+        case topRightData: // Assistant Level , Front Right 3
         {
           setAxisPosition_mm(LEVEL_CORNERS_Z_HOP, (axis_t)Z);
           setAxisPosition_mm((X_MAX_BED - LEVEL_CORNERS_INSET), (axis_t)X);
@@ -1202,7 +1202,7 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
           waitway = 6;
           break;
         }
-        case lowRightData: // Assitant Level , Back Right 4
+        case lowRightData: // Assistant Level , Back Right 4
         {
           setAxisPosition_mm(LEVEL_CORNERS_Z_HOP, (axis_t)Z);
           setAxisPosition_mm((X_MAX_BED - LEVEL_CORNERS_INSET), (axis_t)X);
@@ -1300,10 +1300,10 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
       RTS_SndData(10, FilenameIcon);
       break;
 
-    case Filement:
+    case Filament:
 
       unsigned int IconTemp;
-      if (recdat.addr == Exchfilement)
+      if (recdat.addr == ExchFilament)
       {
         if (getActualTemp_celsius(H0) < EXTRUDE_MINTEMP && recdat.data[0] < 5)
         {
@@ -1315,22 +1315,22 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
 
         switch(recdat.data[0])
           {
-          case 1 : // Unload filement1
+          case 1 : // Unload filament1
           {
             setAxisPosition_mm((getAxisPosition_mm(E0) - ChangeMaterialbuf[0]), E0);
             break;
           }
-          case 2: // Load filement1
+          case 2: // Load filament1
           {
             setAxisPosition_mm((getAxisPosition_mm(E0) + ChangeMaterialbuf[0]), E0);
             break;
           }
-          case 3: // Unload filement2
+          case 3: // Unload filament2
           {
             setAxisPosition_mm((getAxisPosition_mm(E1) - ChangeMaterialbuf[1]), E1);
             break;
           }
-          case 4: // Load filement2
+          case 4: // Load filament2
           {
             setAxisPosition_mm((getAxisPosition_mm(E1) + ChangeMaterialbuf[1]), E1);
             break;
@@ -1368,14 +1368,14 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
           case 0xF0: // not to cancel heating
             break;
         }
-        RTS_SndData(10 * ChangeMaterialbuf[0], FilementUnit1); //It's ChangeMaterialbuf for show,instead of current_position[E_AXIS] in them.
-        RTS_SndData(10 * ChangeMaterialbuf[1], FilementUnit2);
+        RTS_SndData(10 * ChangeMaterialbuf[0], FilamentUnit1); //It's ChangeMaterialbuf for show,instead of current_position[E_AXIS] in them.
+        RTS_SndData(10 * ChangeMaterialbuf[1], FilamentUnit2);
       }
-      else if (recdat.addr == FilementUnit1)
+      else if (recdat.addr == FilamentUnit1)
       {
         ChangeMaterialbuf[0] = ((float)recdat.data[0]) / 10;
       }
-      else if (recdat.addr == FilementUnit2)
+      else if (recdat.addr == FilamentUnit2)
       {
         ChangeMaterialbuf[1] = ((float)recdat.data[0]) / 10;
       }
@@ -1420,7 +1420,7 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
           break;
       }
       break;
-    case No_Filement:
+    case No_Filament:
       SERIAL_ECHOLN("\n No Filament");
 
       if (recdat.data[0] == 1) //Filament is out, resume / resume selected on screen
@@ -1440,32 +1440,35 @@ SERIAL_ECHOLN(PSTR("BeginSwitch"));
           PrintStatue[1] = 0;
           PrinterStatusKey[1] = 3;
           RTS_SndData(ExchangePageBase + 53, ExchangepageAddr);
-          FilementStatus[0] = 0; // recover the status waiting to check filements
+          FilamentStatus[0] = 0; // recover the status waiting to check filaments
         }
       }
-      else if (recdat.data[0] == 0) // Filamet is out, Cancel Selected
+      else if (recdat.data[0] == 0) // Filament is out, Cancel Selected
       {
           SERIAL_ECHOLN(" Filament Response No");
-          if (FilementStatus[0] == 1)
+          if (FilamentStatus[0] == 1)
           {
             SERIAL_ECHOLN("Filament Stat 0 - 1");
+            // select file to print
             RTS_SndData(ExchangePageBase + 46, ExchangepageAddr);
             PrinterStatusKey[0] = 0;
             setUserConfirmed();
           }
-          else if (FilementStatus[0] == 2) // like the pause
+          else if (FilamentStatus[0] == 2) // like the pause
           {
             SERIAL_ECHOLN("Filament Stat 0 - 2");
+            // print status page?
             RTS_SndData(ExchangePageBase + 54, ExchangepageAddr);
             setUserConfirmed();
           }
-          else if (FilementStatus[0] == 3)
+          else if (FilamentStatus[0] == 3)
           {
+            // change filament?
             SERIAL_ECHOLN("Filament Stat 0 - 3");
             RTS_SndData(ExchangePageBase + 65, ExchangepageAddr);
             setUserConfirmed();
           }
-          FilementStatus[0] = 0; // recover the status waiting to check filements
+          FilamentStatus[0] = 0; // recover the status waiting to check filaments
           stopPrint();
       }
       break;
@@ -1765,7 +1768,7 @@ void onFilamentRunout()
 	PrintStatue[1] = 1; // for returning the corresponding page
 	PrinterStatusKey[1] = 4;
 	TPShowStatus = false;
-  FilementStatus[0] = 2;
+  FilamentStatus[0] = 2;
   rtscheck.RTS_SndData(ExchangePageBase + 78, ExchangepageAddr);
 }
 void onFilamentRunout(extruder_t extruder)
@@ -1774,17 +1777,19 @@ void onFilamentRunout(extruder_t extruder)
   PrintStatue[1] = 1; // for returning the corresponding page
   PrinterStatusKey[1] = 4;
   TPShowStatus = false;
-  FilementStatus[0] = 2;
+  FilamentStatus[0] = 2;
   rtscheck.RTS_SndData(ExchangePageBase + 78, ExchangepageAddr);
 }
 void onUserConfirmRequired(const char *const msg)
 {
+  SERIAL_ECHOLN("==onUserConfirmRequired==");
   PrintStatue[1] = 1; // for returning the corresponding page
   PrinterStatusKey[1] = 4;
   TPShowStatus = false;
-  FilementStatus[0] = 2;
+  //Not sure if this is intentional here?
+  //FilamentStatus[0] = 2;
   rtscheck.RTS_SndData(ExchangePageBase + 78, ExchangepageAddr);
-	SERIAL_ECHOLN("==onUserConfirmRequired==");
+	
 }
 void onStatusChanged(const char *const msg)
 {
